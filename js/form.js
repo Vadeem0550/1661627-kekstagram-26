@@ -1,5 +1,4 @@
 import {getStringLength, escapeButton} from './util.js';
-import {closeModal} from './pop-up.js';
 
 const HASHTAGS = 5;
 const DESCRIPTION = 140;
@@ -33,8 +32,9 @@ function onPopupKeyDownEsc(evt) {
 }
 
 function closeUploadForm() {
-  closeModal();
-  resetForm();
+  editForm.classList.add('hidden');
+  document.body.classList.remove('madal-open');
+  document.addEventListener('keydown', escapeButton);
 }
 
 closeEditForm.addEventListener('click', () => {

@@ -4,21 +4,35 @@ const AVATAR_HEIGHT = 35;
 const AVATAR_WIDTH = 35;
 
 const fullSizePic = document.querySelector('.big-picture');
-const closeFullSizePic = document.querySelector('.big-picture__cancel');
-const commentLoaderEl = document.querySelector('.comments-loader');
+const closeFullSizePic = fullSizePic.querySelector('.big-picture__cancel');
+const commentEl = fullSizePic.querySelector('.social__comment');
 const commentsList = document.querySelector('.social__comments');
-const commentEl = document.querySelector('.social__comment');
-const commentCount = document.querySelector('.social__comment-count');
+
+const commentCount = fullSizePic.querySelector('.social__comment-count');
+commentCount.classList.add('hidden');
+const commentLoaderEl = document.querySelector('.comments-loader');
+commentLoaderEl.classList.add('hidden');
 
 const createCommentItem = ({avatar, name, message}) => {
   const commentItem = commentEl.cloneNode(true);
-  commentItem.querySelector('.social__picture').src = avatar;
-  commentItem.querySelector('.social__picture').alt = name;
-  commentItem.querySelector('.social__picture').height = AVATAR_HEIGHT;
-  commentItem.querySelector('.social__picture').width = AVATAR_WIDTH;
-  commentItem.querySelector('.social__text').textContent = message;
+  const userPicture = document.createElement('img');
+  userPicture.classList.add('.social__picture');
+  userPicture.src = avatar;
+  userPicture.alt = name;
+  userPicture.height = AVATAR_HEIGHT;
+  userPicture.width = AVATAR_WIDTH;
+  userPicture.textContent = message;
+
+  const commentText = document.createElement('p');
+  commentText.classList.add('social__text');
+  commentText.textContent = message;
+  commentItem.append(commentText);
 
   return commentItem;
+};
+
+const clearComments = () => {
+  commentsList.innerHTML = '';
 };
 
 const displayComments = (comments) => {
@@ -26,7 +40,7 @@ const displayComments = (comments) => {
   comments.forEach(({avatar, name, message}) => {
     commentListFragment.append(createCommentItem({avatar, name, message}));
   });
-  commentsList.innerHTML = '';
+  clearComments();
   commentsList.append(commentListFragment);
 };
 
