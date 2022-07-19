@@ -1,9 +1,11 @@
 import {getStringLength, escapeButton} from './util.js';
+import {closeModal} from './pop-up.js';
 
 const HASHTAGS = 5;
 const DESCRIPTION = 140;
 
 const re = /^#[A-Za-zA-Яф-яЁё0-9]{1,19}$/;
+
 const uploadForm = document.querySelector('.img-upload__form');
 const uploadImage = uploadForm.querySelector('#upload-file');
 const closeEditForm = uploadForm.querySelector('#upload-cancel');
@@ -11,7 +13,6 @@ const editForm = uploadForm.querySelector('.img-upload__overlay');
 const hashtagsElem = uploadForm.querySelector('.text__hashtags');
 const description = uploadForm.querySelector('.text__description');
 
-const resetForm = () => uploadForm.reset();
 
 uploadImage.addEventListener('change', () => {
   editForm.classList.remove('hidden');
@@ -33,8 +34,9 @@ function onPopupKeyDownEsc(evt) {
 
 function closeUploadForm() {
   editForm.classList.add('hidden');
-  document.body.classList.remove('madal-open');
+  document.body.classList.remove('modal-open');
   document.addEventListener('keydown', escapeButton);
+  uploadImage.value = '';
 }
 
 closeEditForm.addEventListener('click', () => {
@@ -82,6 +84,15 @@ pristine.addValidator(hashtagsElem, checkHashtagSymbols, 'Хэш-тег долж
 pristine.addValidator(hashtagsElem, checkUniquenessHashtags, 'Хэш-теги не должны повторяться. Хэштеги нечувствительны к регистру.');
 pristine.addValidator(hashtagsElem, checkHashtagsCount, `Можно указать не более ${HASHTAGS} хэш-тегов.`);
 pristine.addValidator(description, checkDescription, `Максимальная длина комментария ${DESCRIPTION} символов.`);
+
+const inputEcsKeydown = (evt) => {
+  if (escapeButton(evt)) {
+    evt.stopPropagation();
+  }
+};
+
+hashtagsElem.addEventListener('keydown', inputEcsKeydown);
+description.addEventListener('keydown',inputEcsKeydown);
 
 uploadForm.addEventListener('submit', (evt) => {
   evt.preventDefault();
