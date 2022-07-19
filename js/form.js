@@ -1,8 +1,6 @@
-import {getStringLength, escapeButton} from './util.js';
-import {closeModal} from './pop-up.js';
+import {escapeButton} from './util.js';
 
-const HASHTAGS = 5;
-const DESCRIPTION = 140;
+const DESCRIPTION = 20;
 
 const re = /^#[A-Za-zA-Яф-яЁё0-9]{1,19}$/;
 
@@ -13,10 +11,17 @@ const editForm = uploadForm.querySelector('.img-upload__overlay');
 const hashtagsElem = uploadForm.querySelector('.text__hashtags');
 const description = uploadForm.querySelector('.text__description');
 
+const MessageErrors = {
+  INVALID_HASHTAGS: `Хэш-тег должен начинаться с символа #, содержать только буквы и числа. Максимальная длина одного хэш-тега 20 символов.
+  Хеш-тег не может состоять только из одной решётки. Максимальная длина одного хэш-тега 20 символов, включая решётку.`,
+  NOT_UNIQUE_HASHTAGS: 'Один и тот же хэш-тег не может быть использован дважды.',
+  INVALID_COUNT_HASHTAGS: 'Нельзя указать больше пяти хэш-тегов.'
+};
 
 uploadImage.addEventListener('change', () => {
   editForm.classList.remove('hidden');
   document.body.classList.add('modal-open');
+
   document.addEventListener('keydown', (evt) => {
     if (escapeButton(evt)) {
       evt.preventDefault();
@@ -59,17 +64,24 @@ hashtagsElem.addEventListener('blur', () => {
   document.removeEventListener('keydown', onPopupKeyDownEsc);
 });
 
-const checkDescription = () => getStringLength(description.value, DESCRIPTION);
-const getHashtags = () => hashtagsElem.value.split('').filter(Boolean);
-const checkHashtagSymbols = () => getHashtags().every((item) => re.test(item));
-
-const checkUniquenessHashtags = () => {
-  const hashtags = getHashtags().map((item) => item.toLowerCase());
-  const uniqueHashtags = new Set(hashtags);
-  return hashtags.length === uniqueHashtags.size;
+// const checkDescription = () => getStringLength(description.value, DESCRIPTION);
+const validateHAshtags = (value) => {
+  const getHashtags = value.split('').filter(Boolean);
+  return getHashtags.every((item) => re.test(item));
 };
 
-const checkHashtagsCount = () => getHashtags().length <= HASHTAGS;
+const checkUniquenessHashtags = (value) => {
+  // const hashtags = getHashtags().map((item) => item.toLowerCase());
+  // const uniqueHashtags = new Set(hashtags);
+  // return hashtags.length === uniqueHashtags.size;
+  const hashTags = value.toLowerCase().trim().split(' ');
+  return hashTags.length === 0 || hashTags.length === (new Set(hashTags)).size;
+};
+
+const checkHashtagsCount = (value) => {
+  const hashTags = value.toLowerCase().trim().split(' ');
+  return hashTags.length <= DESCRIPTION;
+};
 
 const pristine = new Pristine(uploadForm, {
   classTo: 'text__field-wrapper',
@@ -80,10 +92,9 @@ const pristine = new Pristine(uploadForm, {
   errorTextClass: 'text__error-message'
 });
 
-pristine.addValidator(hashtagsElem, checkHashtagSymbols, 'Хэш-тег должен начинаться с символа #, содержать только буквы и числа. Максимальная длина одного хэш-тега 20 символов.');
-pristine.addValidator(hashtagsElem, checkUniquenessHashtags, 'Хэш-теги не должны повторяться. Хэштеги нечувствительны к регистру.');
-pristine.addValidator(hashtagsElem, checkHashtagsCount, `Можно указать не более ${HASHTAGS} хэш-тегов.`);
-pristine.addValidator(description, checkDescription, `Максимальная длина комментария ${DESCRIPTION} символов.`);
+pristine.addValidator(hashtagsElem, validateHAshtags, MessageErrors.INVALID_HASHTAGS);
+pristine.addValidator(hashtagsElem, checkUniquenessHashtags, MessageErrors.NOT_UNIQUE_HASHTAGS);
+pristine.addValidator(hashtagsElem, checkHashtagsCount, MessageErrors.INVALID_COUNT_HASHTAGS);
 
 const inputEcsKeydown = (evt) => {
   if (escapeButton(evt)) {
@@ -92,7 +103,7 @@ const inputEcsKeydown = (evt) => {
 };
 
 hashtagsElem.addEventListener('keydown', inputEcsKeydown);
-description.addEventListener('keydown',inputEcsKeydown);
+description.addEventListener('keydown', inputEcsKeydown);
 
 uploadForm.addEventListener('submit', (evt) => {
   evt.preventDefault();
