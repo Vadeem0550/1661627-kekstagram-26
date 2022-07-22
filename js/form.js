@@ -12,8 +12,7 @@ const hashtagsElem = uploadForm.querySelector('.text__hashtags');
 const description = uploadForm.querySelector('.text__description');
 
 const MessageErrors = {
-  INVALID_HASHTAGS: `Хэш-тег должен начинаться с символа #, содержать только буквы и числа. Максимальная длина одного хэш-тега 20 символов.
-  Хеш-тег не может состоять только из одной решётки. Максимальная длина одного хэш-тега 20 символов, включая решётку.`,
+  INVALID_HASHTAGS: 'Хэш-тег должен начинаться с символа #, содержать только буквы и числа. Максимальная длина одного хэш-тега 20 символов.',
   NOT_UNIQUE_HASHTAGS: 'Один и тот же хэш-тег не может быть использован дважды.',
   INVALID_COUNT_HASHTAGS: 'Нельзя указать больше пяти хэш-тегов.'
 };
@@ -65,7 +64,7 @@ hashtagsElem.addEventListener('blur', () => {
 });
 
 // const checkDescription = () => getStringLength(description.value, DESCRIPTION);
-const validateHAshtags = (value) => {
+const validateHashtags = (value) => {
   const getHashtags = value.split('').filter(Boolean);
   return getHashtags.every((item) => re.test(item));
 };
@@ -92,7 +91,7 @@ const pristine = new Pristine(uploadForm, {
   errorTextClass: 'text__error-message'
 });
 
-pristine.addValidator(hashtagsElem, validateHAshtags, MessageErrors.INVALID_HASHTAGS);
+pristine.addValidator(hashtagsElem, validateHashtags, MessageErrors.INVALID_HASHTAGS);
 pristine.addValidator(hashtagsElem, checkUniquenessHashtags, MessageErrors.NOT_UNIQUE_HASHTAGS);
 pristine.addValidator(hashtagsElem, checkHashtagsCount, MessageErrors.INVALID_COUNT_HASHTAGS);
 
